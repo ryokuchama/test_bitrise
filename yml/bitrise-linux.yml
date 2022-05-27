@@ -1,0 +1,41 @@
+---
+format_version: '11'
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: macos
+workflows:
+  primary:
+    steps:
+    - cache-pull@2: {}
+    - brew-install@0:
+        inputs:
+        - packages: cmake python3 unzip
+    - script@1:
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            # cd /usr/local
+            # wget https://dl.google.com/android/repository/android-ndk-r24-linux.zip \
+            # unzip android-ndk-r24-linux.zip \
+            # rm -rf /usr/local/android-ndk-r24-linux.zip
+            # export NDK_PATH=user/local/android-ndk-r24-linux/build/cmake
+            pip install ninja
+            rmdir -Rf linux_build
+            sudo mkdir linux_build
+            sudo cmake -G Ninja -B linux_build
+            sudo ninja -C linux_build
+
+meta:
+  bitrise.io:
+    stack: osx-xcode-13.4.x
+    machine_type_id: g2.4core
+app:
+  envs:
+  - opts:
+      is_expand: false
+    BITRISE_PROJECT_PATH: "~/virtualenv/ios_build/IntercomCommonLib.xcodeproj"
+  - opts:
+      is_expand: false
+    BITRISE_SCHEME: test
+  - opts:
+      is_expand: false
+    BITRISE_EXPORT_METHOD: none
